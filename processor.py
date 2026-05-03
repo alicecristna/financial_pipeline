@@ -16,7 +16,7 @@ class DataProcessor:
 
     # ---------- 任务 10：关键位置日志埋点 ----------
     def load_raw(self, optimize: bool = True):
-        """读取 data_dir 下所有 CSV，并拼成一个 DataFrame"""
+        """读取 data_dir 下所有 CSV 文件，合并为一个大 DataFrame"""
         df_list = []
 
         for file in os.listdir(self.data_dir):
