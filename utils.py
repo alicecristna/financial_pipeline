@@ -1,12 +1,21 @@
 """utils.py — 日志配置 & dtype 优化"""
 import logging
 from pathlib import Path
+import pandas as pd
 
-def setup_logger(name: str, log_file: str = "pipeline.log") -> logging.Logger:
-    logger = logging.getLogger(name)
+
+BASE_DIR = Path(__file__).resolve().parent
+logger = logging.getLogger(__name__)
+
+def setup_logger(name: str, log_file: str = None) -> logging.Logger:
+    """日志配置"""
+    if log_file is None:
+        log_file = str(BASE_DIR / "logs" / "pipeline.log")
+
+    
     logger.setLevel(logging.DEBUG)
 
-    if logger.handlers:                    # ← 你的简洁 + 我的防重复
+    if logger.handlers:
         return logger
 
     fmt = logging.Formatter(
@@ -26,3 +35,19 @@ def setup_logger(name: str, log_file: str = "pipeline.log") -> logging.Logger:
     logger.addHandler(console)
     logger.addHandler(fh)
     return logger
+
+def validate_price_data(df: pd.DataFrame, name: str = ""):
+    """返回 (是否通过, 错误信息)"""
+    label = f"[{name}] " if name else ""
+
+    if df.empty:
+        return False, f"{label}数据为空"
+    if df.isna().all(axis=1).any():
+        bad_rows = df[df.isna().all(axis=1)].index[:3].tolist()
+        return False, f"{label}全 NaN 行: {bad_rows}"
+    if not df.index.is_monotonic_increasing:
+        return False, f"{label}日期不单调"
+    if df.index.max() > pd.Timestamp.now():
+        return False, f"{label}存在未来日期: {df.index.max()}"
+
+    return True, ""

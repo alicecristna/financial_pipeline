@@ -3,6 +3,24 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# macOS
+.DS_Store
+
+# Jupyter Notebooks
+*.ipynb
+
+# Database files
+*.db
+
+# Local data & output
+data/
+output/
+annual_reports/
+build_index.py
+
+# Claude Code
+CLAUDE.md
+
 # C extensions
 *.so
 
